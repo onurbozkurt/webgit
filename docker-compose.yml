@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+    webgit:
+        build: .
+        ports:
+            - "3333:3333"
+        volumes:
+            - .:/app
+            - /app/node_modules
+            - ./repos:/repos
+        environment:
+            - REPOS_BASE_PATH=/repos
+            - PORT=3333

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#238636"/>
+      <stop offset="100%" stop-color="#1f6feb"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Main branch line -->
+  <line x1="196" y1="120" x2="196" y2="392" stroke="#fff" stroke-width="36" stroke-linecap="round"/>
+  <!-- Branch line -->
+  <path d="M196 240 C196 240, 240 200, 316 180" stroke="#fff" stroke-width="36" stroke-linecap="round" fill="none"/>
+  <!-- Bottom commit dot -->
+  <circle cx="196" cy="392" r="36" fill="#fff"/>
+  <circle cx="196" cy="392" r="18" fill="#238636"/>
+  <!-- Top commit dot -->
+  <circle cx="196" cy="120" r="36" fill="#fff"/>
+  <circle cx="196" cy="120" r="18" fill="#1f6feb"/>
+  <!-- Branch commit dot -->
+  <circle cx="316" cy="180" r="36" fill="#fff"/>
+  <circle cx="316" cy="180" r="18" fill="#1f6feb"/>
+</svg>

@@ -1,0 +1,30 @@
+{
+    "name": "webgit",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "@tailwindcss/postcss": "^4.2.1",
+        "@types/node": "^25.5.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "diff2html": "^3.4.56",
+        "next": "^16.1.6",
+        "postcss": "^8.5.8",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "simple-git": "^3.33.0",
+        "tailwindcss": "^4.2.1",
+        "typescript": "^5.9.3",
+        "uuid": "^13.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^9.39.4",
+        "eslint-config-next": "^16.1.6"
+    }
+}

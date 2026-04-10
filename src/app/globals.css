@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #1f2328;
+    --card: #f6f8fa;
+    --card-foreground: #1f2328;
+    --popover: #ffffff;
+    --popover-foreground: #1f2328;
+    --primary: #1a7f37;
+    --primary-foreground: #ffffff;
+    --secondary: #eaeef2;
+    --secondary-foreground: #1f2328;
+    --muted: #eaeef2;
+    --muted-foreground: #656d76;
+    --accent: #0969da;
+    --accent-foreground: #ffffff;
+    --destructive: #cf222e;
+    --destructive-foreground: #ffffff;
+    --border: #d0d7de;
+    --input: #f6f8fa;
+    --ring: #0969da;
+    --radius: 6px;
+    --hover: rgba(0, 0, 0, 0.04);
+    --selection: rgba(9, 105, 218, 0.15);
+    --diff-del-bg: rgba(255, 129, 130, 0.15);
+    --diff-ins-bg: rgba(87, 171, 90, 0.15);
+    --diff-del-highlight: rgba(255, 129, 130, 0.3);
+    --diff-ins-highlight: rgba(87, 171, 90, 0.3);
+    --diff-info-bg: rgba(9, 105, 218, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0d1117;
+        --foreground: #e6edf3;
+        --card: #161b22;
+        --card-foreground: #e6edf3;
+        --popover: #161b22;
+        --popover-foreground: #e6edf3;
+        --primary: #238636;
+        --primary-foreground: #ffffff;
+        --secondary: #21262d;
+        --secondary-foreground: #e6edf3;
+        --muted: #21262d;
+        --muted-foreground: #8b949e;
+        --accent: #1f6feb;
+        --accent-foreground: #ffffff;
+        --destructive: #da3633;
+        --destructive-foreground: #ffffff;
+        --border: #30363d;
+        --input: #21262d;
+        --ring: #1f6feb;
+        --hover: rgba(255, 255, 255, 0.05);
+        --selection: rgba(31, 111, 235, 0.15);
+        --diff-del-bg: rgba(248, 81, 73, 0.1);
+        --diff-ins-bg: rgba(63, 185, 80, 0.1);
+        --diff-del-highlight: rgba(248, 81, 73, 0.2);
+        --diff-ins-highlight: rgba(63, 185, 80, 0.2);
+        --diff-info-bg: rgba(31, 111, 235, 0.1);
+    }
+}
+
+* {
+    border-color: var(--border);
+}
+
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+/* diff2html theme overrides */
+.d2h-wrapper {
+    --d2h-bg-color: var(--card);
+    --d2h-code-line-bg-color: var(--card);
+}
+
+.d2h-file-header {
+    background-color: var(--secondary) !important;
+    border-color: var(--border) !important;
+    color: var(--foreground) !important;
+}
+
+.d2h-file-wrapper {
+    border-color: var(--border) !important;
+}
+
+.d2h-code-linenumber,
+.d2h-code-line {
+    background-color: var(--card) !important;
+    color: var(--foreground) !important;
+}
+
+.d2h-del {
+    background-color: var(--diff-del-bg) !important;
+}
+
+.d2h-ins {
+    background-color: var(--diff-ins-bg) !important;
+}
+
+.d2h-code-side-line del,
+.d2h-del .d2h-code-line-ctn {
+    background-color: var(--diff-del-highlight) !important;
+}
+
+.d2h-code-side-line ins,
+.d2h-ins .d2h-code-line-ctn {
+    background-color: var(--diff-ins-highlight) !important;
+}
+
+.d2h-info {
+    background-color: var(--diff-info-bg) !important;
+    color: var(--muted-foreground) !important;
+}
+
+/* Fix diff2html scroll: line numbers and content must scroll together */
+.d2h-wrapper {
+    overflow: visible !important;
+}
+
+.d2h-file-wrapper {
+    overflow: visible !important;
+}
+
+.d2h-file-diff {
+    overflow: visible !important;
+}
+
+.d2h-code-wrapper {
+    overflow: visible !important;
+}
+
+.d2h-code-wrapper table {
+    width: 100%;
+}
+
+.d2h-code-linenumber {
+    position: static !important;
+    user-select: none;
+}
+
+/* Utility class for hover backgrounds */
+.hover-bg:hover {
+    background-color: var(--hover);
+}
