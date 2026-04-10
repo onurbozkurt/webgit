@@ -100,6 +100,7 @@ interface RepoContextValue {
     doDeleteBranch: (name: string) => Promise<void>;
     doDiscard: (files: string[]) => Promise<void>;
     doGitignore: (pattern: string) => Promise<void>;
+    doCherryPick: (hash: string, targetBranch: string) => Promise<void>;
 }
 
 const RepoContext = createContext<RepoContextValue | null>(null);
@@ -313,6 +314,16 @@ export function RepoProvider({
         [repoId, withLoading, refreshStatus]
     );
 
+    const doCherryPick = useCallback(
+        async (hash: string, targetBranch: string) => {
+            await withLoading("cherryPick", async () => {
+                await repoApi.cherryPick(repoId, hash, targetBranch);
+                await refreshLog();
+            });
+        },
+        [repoId, withLoading, refreshLog]
+    );
+
     const value: RepoContextValue = {
         state,
         dispatch,
@@ -332,6 +343,7 @@ export function RepoProvider({
         doDeleteBranch,
         doDiscard,
         doGitignore,
+        doCherryPick,
     };
 
     return <RepoContext.Provider value={value}>{children}</RepoContext.Provider>;

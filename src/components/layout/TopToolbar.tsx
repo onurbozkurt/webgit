@@ -7,7 +7,7 @@ import { BranchSwitcher } from "@/components/repo/BranchSwitcher";
 
 export function TopToolbar() {
     const router = useRouter();
-    const { state, doFetch, doPush, doPull } = useRepo();
+    const { state, refreshStatus, doFetch, doPush, doPull } = useRepo();
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     const handleAction = async (action: string, fn: () => Promise<void>) => {
@@ -39,6 +39,23 @@ export function TopToolbar() {
 
             {/* Branch switcher */}
             <BranchSwitcher />
+
+            {/* Refresh status */}
+            <button
+                onClick={() => handleAction("status", refreshStatus)}
+                disabled={actionLoading !== null}
+                className="px-2 py-1.5 rounded-md text-sm hover-bg transition-colors disabled:opacity-50"
+                style={{ color: "var(--muted-foreground)" }}
+                title="Refresh Status"
+            >
+                {actionLoading === "status" ? (
+                    <Spinner />
+                ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                )}
+            </button>
 
             <div className="flex-1" />
 

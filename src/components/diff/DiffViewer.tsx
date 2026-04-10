@@ -10,7 +10,14 @@ interface DiffViewerProps {
 }
 
 export function DiffViewer({ diff, fileName }: DiffViewerProps) {
-    const [viewMode, setViewMode] = useState<"line-by-line" | "side-by-side">("line-by-line");
+    const [viewMode, setViewModeState] = useState<"line-by-line" | "side-by-side">(() => {
+        if (typeof window === "undefined") return "line-by-line";
+        return (localStorage.getItem("webgit-diff-view-mode") as "line-by-line" | "side-by-side") || "line-by-line";
+    });
+    const setViewMode = (mode: "line-by-line" | "side-by-side") => {
+        setViewModeState(mode);
+        localStorage.setItem("webgit-diff-view-mode", mode);
+    };
 
     const diffHtml = useMemo(() => {
         if (!diff) return "";

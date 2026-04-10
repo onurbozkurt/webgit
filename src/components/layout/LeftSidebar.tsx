@@ -111,9 +111,7 @@ export function LeftSidebar() {
                     <CommitPanel />
                 </>
             ) : (
-                <div className="flex-1 overflow-auto">
-                    <CommitList />
-                </div>
+                <CommitList />
             )}
 
             {/* Resize handle */}

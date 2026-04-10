@@ -33,13 +33,15 @@ interface ContextMenuState {
 function FileItem({
     file,
     isSelected,
+    isChecked,
     onSelect,
     onToggleStage,
     onContextMenu,
 }: {
     file: FileChange;
     isSelected: boolean;
-    onSelect: () => void;
+    isChecked: boolean;
+    onSelect: (e: React.MouseEvent) => void;
     onToggleStage: () => void;
     onContextMenu: (e: React.MouseEvent) => void;
 }) {
@@ -51,7 +53,8 @@ function FileItem({
         <div
             className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover-bg transition-colors group"
             style={{
-                backgroundColor: isSelected ? "var(--selection)" : undefined,
+                backgroundColor: isChecked ? "var(--selection)" : isSelected ? "var(--selection)" : undefined,
+                borderLeft: isChecked ? "2px solid var(--primary)" : "2px solid transparent",
             }}
             onClick={onSelect}
             onContextMenu={onContextMenu}
@@ -91,13 +94,17 @@ function ContextMenu({
     y,
     file,
     repoPath,
+    checkedFiles,
     onClose,
+    onClearChecked,
 }: {
     x: number;
     y: number;
     file: FileChange;
     repoPath: string;
+    checkedFiles: Set<string>;
     onClose: () => void;
+    onClearChecked: () => void;
 }) {
     const { doDiscard, doGitignore, refreshStatus } = useRepo();
     const menuRef = useRef<HTMLDivElement>(null);
@@ -143,11 +150,19 @@ function ContextMenu({
         await fn();
     };
 
+    const isMulti = checkedFiles.size > 1 && checkedFiles.has(file.path);
     const menuItems: { label: string; action: () => Promise<void>; destructive?: boolean }[] = [
         {
-            label: "Discard Changes",
+            label: isMulti ? `Discard ${checkedFiles.size} Selected Files` : "Discard Changes",
             destructive: true,
-            action: () => doDiscard([file.path]),
+            action: async () => {
+                if (isMulti) {
+                    await doDiscard([...checkedFiles]);
+                    onClearChecked();
+                } else {
+                    await doDiscard([file.path]);
+                }
+            },
         },
     ];
 
@@ -237,17 +252,48 @@ function ContextMenu({
 }
 
 export function ChangesFileList() {
-    const { state, dispatch, stageFiles, unstageFiles, loadFileDiff } = useRepo();
+    const { state, dispatch, stageFiles, unstageFiles, loadFileDiff, doDiscard } = useRepo();
     const { fileChanges, selectedFile, repoPath } = state;
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+    const [checkedFiles, setCheckedFiles] = useState<Set<string>>(new Set());
 
     const stagedFiles = fileChanges.filter((f) => f.isStaged);
     const unstagedFiles = fileChanges.filter((f) => !f.isStaged);
 
-    const handleSelect = (file: FileChange) => {
-        dispatch({ type: "SELECT_FILE", payload: file.path });
-        loadFileDiff(file.path, file.isStaged);
+    // Clean up checked files that no longer exist
+    useEffect(() => {
+        const currentPaths = new Set(fileChanges.map(f => f.path));
+        setCheckedFiles(prev => {
+            const next = new Set([...prev].filter(p => currentPaths.has(p)));
+            return next.size === prev.size ? prev : next;
+        });
+    }, [fileChanges]);
+
+    const handleSelect = (file: FileChange, e: React.MouseEvent) => {
+        if (e.metaKey || e.ctrlKey) {
+            setCheckedFiles(prev => {
+                const next = new Set(prev);
+                if (next.has(file.path)) {
+                    next.delete(file.path);
+                } else {
+                    next.add(file.path);
+                }
+                return next;
+            });
+        } else {
+            setCheckedFiles(new Set());
+            dispatch({ type: "SELECT_FILE", payload: file.path });
+            loadFileDiff(file.path, file.isStaged);
+        }
     };
+
+    const handleDiscardChecked = async () => {
+        if (checkedFiles.size === 0) return;
+        await doDiscard([...checkedFiles]);
+        setCheckedFiles(new Set());
+    };
+
+    const clearChecked = useCallback(() => setCheckedFiles(new Set()), []);
 
     const handleToggleStage = (file: FileChange) => {
         if (file.isStaged) {
@@ -287,6 +333,34 @@ export function ChangesFileList() {
 
     return (
         <div>
+            {/* Selection action bar */}
+            {checkedFiles.size > 0 && (
+                <div
+                    className="flex items-center justify-between px-3 py-2 border-b"
+                    style={{ backgroundColor: "var(--selection)" }}
+                >
+                    <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>
+                        {checkedFiles.size} file{checkedFiles.size > 1 ? "s" : ""} selected
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={clearChecked}
+                            className="text-xs hover:underline"
+                            style={{ color: "var(--muted-foreground)" }}
+                        >
+                            Clear
+                        </button>
+                        <button
+                            onClick={handleDiscardChecked}
+                            className="text-xs font-medium hover:underline"
+                            style={{ color: "var(--destructive)" }}
+                        >
+                            Discard
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Staged */}
             {stagedFiles.length > 0 && (
                 <div>
@@ -307,7 +381,8 @@ export function ChangesFileList() {
                             key={`staged-${file.path}`}
                             file={file}
                             isSelected={selectedFile === file.path}
-                            onSelect={() => handleSelect(file)}
+                            isChecked={checkedFiles.has(file.path)}
+                            onSelect={(e) => handleSelect(file, e)}
                             onToggleStage={() => handleToggleStage(file)}
                             onContextMenu={(e) => handleContextMenu(e, file)}
                         />
@@ -335,7 +410,8 @@ export function ChangesFileList() {
                             key={`unstaged-${file.path}`}
                             file={file}
                             isSelected={selectedFile === file.path}
-                            onSelect={() => handleSelect(file)}
+                            isChecked={checkedFiles.has(file.path)}
+                            onSelect={(e) => handleSelect(file, e)}
                             onToggleStage={() => handleToggleStage(file)}
                             onContextMenu={(e) => handleContextMenu(e, file)}
                         />
@@ -349,7 +425,9 @@ export function ChangesFileList() {
                     y={contextMenu.y}
                     file={contextMenu.file}
                     repoPath={repoPath}
+                    checkedFiles={checkedFiles}
                     onClose={() => setContextMenu(null)}
+                    onClearChecked={clearChecked}
                 />
             )}
         </div>

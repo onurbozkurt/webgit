@@ -94,4 +94,7 @@ export const repoApi = {
 
     gitignore: (id: string, pattern: string) =>
         apiPost<{ success: boolean }>(`/api/repos/${id}/gitignore`, { pattern }),
+
+    cherryPick: (id: string, hash: string, targetBranch: string) =>
+        apiPost<{ success: boolean }>(`/api/repos/${id}/cherry-pick`, { hash, targetBranch }),
 };

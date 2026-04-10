@@ -341,6 +341,25 @@ export async function discardChanges(repoPath: string, files: string[]): Promise
     }
 }
 
+export async function cherryPick(
+    repoPath: string,
+    commitHash: string,
+    targetBranch: string
+): Promise<void> {
+    const git = getGit(repoPath);
+    const currentBranch = (await git.branch()).current;
+
+    try {
+        await git.checkout(targetBranch);
+        await git.raw(["cherry-pick", commitHash]);
+    } catch (err) {
+        await git.raw(["cherry-pick", "--abort"]).catch(() => {});
+        throw err;
+    } finally {
+        await git.checkout(currentBranch);
+    }
+}
+
 export async function addToGitignore(repoPath: string, pattern: string): Promise<void> {
     const gitignorePath = path.join(repoPath, ".gitignore");
     let content = "";
